@@ -18,4 +18,5 @@ jobs:
       - name: Sign-in + daily tasks
         env:
           heybox_ck: ${{ secrets.HEYBOX_CK }}
+          SCKEY: ${{ secrets.SCKEY }}
         run: npm run heybox_sign
