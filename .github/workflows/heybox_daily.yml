@@ -1,1 +1,21 @@
+name: Heybox Daily
 
+on:
+  schedule:
+    - cron: '30 2 * * *'   # 每天 10:30 北京时间 (UTC 02:30)
+  workflow_dispatch: {}
+
+jobs:
+  heybox:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install deps
+        run: npm install
+      - name: Sign-in + daily tasks
+        env:
+          heybox_ck: ${{ secrets.HEYBOX_CK }}
+        run: npm run heybox_sign
