@@ -507,8 +507,9 @@ async function runAccount(account, runtime) {
     lines.push(`- ${t.title || taskKey(t)}: ${mark}${award}`);
   }
   const afterCoin = snapshot.coin;
-  const coinLine = (typeof beforeCoin === "number" && typeof afterCoin === "number")
-    ? `\n H币: ${beforeCoin} → ${afterCoin} (${afterCoin >= beforeCoin ? "+" : ""}${afterCoin - beforeCoin})`
+  const diff = Number(afterCoin) - Number(beforeCoin);
+  const coinLine = (beforeCoin !== undefined && afterCoin !== undefined)
+    ? `\n H币: ${beforeCoin} → ${afterCoin} (${diff >= 0 ? "+" : ""}${Number.isFinite(diff) ? diff : "?"})`
     : `\n 当前H币=${afterCoin ?? "未知"}`;
   const summary = `完成${done.size}个${waiting.length ? `，未完成${waiting.length}个` : ""}${failed.size ? `，执行失败${failed.size}个` : ""}`;
   account.log(`[汇总] ${summary}\n${lines.join("\n")}${coinLine}`, { notify: true });
