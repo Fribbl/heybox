@@ -442,6 +442,7 @@ async function runAccount(account, runtime) {
   account.log("开始每日任务");
   const client = new HeyboxAppClient(account, { runtime });
   let snapshot = await fetchSnapshot(client);
+  const beforeCoin = snapshot.coin;
   const expectedTaskKeys = snapshot.tasks.filter((task) => isDailyTask(task) || TASK_HANDLERS[task.taskId]).map(taskKey);
   const fetchCurrentSnapshot = () => fetchSnapshot(client, expectedTaskKeys);
   account.log(`账号=${snapshot.nickname || account.heyboxId} 黑盒ID=${account.heyboxId} IMEI=${account.imei}`);
@@ -496,11 +497,23 @@ async function runAccount(account, runtime) {
     if (task.state === FINISH_STATE && !failed.has(taskKey(task))) done.add(taskKey(task));
   }
   const waiting = finalTasks.filter((task) => task.state !== FINISH_STATE);
-  account.log(
-    `任务汇总: 完成${done.size}个${waiting.length ? `，未完成${waiting.length}个` : ""}${failed.size ? `，执行失败${failed.size}个` : ""}，当前H币=${snapshot.coin || "未知"}`,
-    { notify: true },
-  );
+
+  // 详细通知：逐任务列出完成/未完成 + 之前->之后 H币
+  const lines = [];
+  for (const t of finalTasks) {
+    const okTask = t.state === FINISH_STATE && !failed.has(taskKey(t));
+    const mark = okTask ? "完成" : "未完成";
+    const award = t.awardText ? ` (${t.awardText})` : "";
+    lines.push(`- ${t.title || taskKey(t)}: ${mark}${award}`);
+  }
+  const afterCoin = snapshot.coin;
+  const coinLine = (typeof beforeCoin === "number" && typeof afterCoin === "number")
+    ? `\n H币: ${beforeCoin} → ${afterCoin} (${afterCoin >= beforeCoin ? "+" : ""}${afterCoin - beforeCoin})`
+    : `\n 当前H币=${afterCoin ?? "未知"}`;
+  const summary = `完成${done.size}个${waiting.length ? `，未完成${waiting.length}个` : ""}${failed.size ? `，执行失败${failed.size}个` : ""}`;
+  account.log(`[汇总] ${summary}\n${lines.join("\n")}${coinLine}`, { notify: true });
   return { ok: waiting.length === 0 && failed.size === 0, doneCount: done.size };
+
 }
 
 async function run() {
