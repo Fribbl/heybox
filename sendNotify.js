@@ -13,7 +13,7 @@ async function sendNotify(title, content) {
   const postData = new URLSearchParams({ title, desp: content || "" }).toString();
   const opts = {
     hostname: "sctapi.ftqq.com",
-    path: `/推送内容/${key}.send`,
+    path: "/" + key + ".send",
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
