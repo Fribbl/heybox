@@ -21,7 +21,7 @@ async function sendNotify(title, content) {
     },
   };
   await new Promise((resolve, reject) => {
-    const req = https.请求(opts, (res) => {
+    const req = https["request"](opts, (res) => {
       res.on("data", () => {});
       res.on("end", () => resolve());
     });
