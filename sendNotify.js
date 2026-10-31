@@ -1,6 +1,5 @@
 // 小黑盒通知 -> Server酱 (ServerChan) 推到微信
-// 使用方法：在 GitHub 仓库 Settings -> Secrets 里新建 SCKEY,值填你的 SENDKEY
-const http = require("http");
+// 需要：GitHub 仓库 Settings -> Secrets 新建 SCKEY，值填你的 SendKey
 const https = require("https");
 
 module.exports = { sendNotify };
@@ -8,7 +7,7 @@ module.exports = { sendNotify };
 async function sendNotify(title, content) {
   const key = process.env.SCKEY || process.env.SENDKEY || "";
   if (!key) {
-    console.log("[sendNotify] 未设置 SCKEY,已跳过微信推送(可在 GitHub Secrets 添加)");
+    console.log("[sendNotify] 未设置 SCKEY，已跳过微信推送");
     return { success: false, message: "no SCKEY" };
   }
   const postData = new URLSearchParams({ title, desp: content || "" }).toString();
